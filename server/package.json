@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "NODE_ENV=development nodemon --exec node --watch './' --ext js index.js",
+    "dev": "nodemon index.js",
     "build": "echo 'No build step needed for Node.js'",
     "start": "NODE_ENV=production node index.js",
     "inngest:dev": "inngest-cli dev"
