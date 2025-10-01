@@ -15,7 +15,12 @@
     "clean": "pnpm --parallel --filter \"./client\" --filter \"./server\" exec rm -rf node_modules && rm -rf node_modules",
     "clean:build": "rm -rf client/dist server/dist",
     "typecheck": "pnpm --parallel --filter \"./client\" --filter \"./server\" run typecheck",
-    "test": "pnpm --parallel --filter \"./client\" --filter \"./server\" run test"
+    "test": "pnpm --parallel --filter \"./client\" --filter \"./server\" run test",
+    "c": "pnpm --filter client",
+    "s": "pnpm --filter server",
+    "install:all": "pnpm install",
+    "update:all": "pnpm update -r",
+    "outdated": "pnpm outdated -r"
   },
   "keywords": [
     "ai",
@@ -28,11 +33,19 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "turbo": "^2.5.8"
   },
   "engines": {
     "node": ">=14.0.0",
     "pnpm": ">=8.0.0"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": ["react", "react-dom"]
+    },
+    "overrides": {
+      "axios": "^1.6.0"
+    }
   }
 }
-

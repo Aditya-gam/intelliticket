@@ -9,6 +9,7 @@ import { inngest } from "./inngest/client.js";
 import { onUserSignup } from "./inngest/functions/on-signup.js";
 import { onTicketCreated } from "./inngest/functions/on-ticket-create.js";
 import { logger } from "./utils/logger.js";
+import { errorHandler } from "./middlewares/error-handler.js";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -20,6 +21,15 @@ app.use(pinoHttp({ logger }));
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 app.use("/api/auth", userRoutes);
 app.use("/api/tickets", ticketRoutes);
 
@@ -30,6 +40,9 @@ app.use(
     functions: [onUserSignup, onTicketCreated],
   })
 );
+
+// Error handler middleware (must be last)
+app.use(errorHandler);
 
 mongoose
   .connect(process.env.MONGO_URI)
