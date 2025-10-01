@@ -1,0 +1,38 @@
+{
+  "name": "intelliticket",
+  "version": "1.0.0",
+  "description": "A smart ticket management system that uses AI to automatically categorize, prioritize, and assign support tickets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"pnpm --filter ./server dev\" \"pnpm --filter ./client dev\"",
+    "dev:inngest": "concurrently -n \"SERVER,CLIENT,INNGEST\" -c \"cyan,magenta,yellow\" \"pnpm --filter ./server dev\" \"pnpm --filter ./client dev\" \"pnpm --filter ./server inngest:dev\"",
+    "build": "pnpm --filter ./client build && pnpm --filter ./server build",
+    "start": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"pnpm --filter ./server start\" \"pnpm --filter ./client preview\"",
+    "lint": "pnpm --parallel --filter \"./client\" --filter \"./server\" run lint",
+    "lint:fix": "pnpm --parallel --filter \"./client\" --filter \"./server\" run lint:fix",
+    "clean": "pnpm --parallel --filter \"./client\" --filter \"./server\" exec rm -rf node_modules && rm -rf node_modules",
+    "clean:build": "rm -rf client/dist server/dist",
+    "typecheck": "pnpm --parallel --filter \"./client\" --filter \"./server\" run typecheck",
+    "test": "pnpm --parallel --filter \"./client\" --filter \"./server\" run test"
+  },
+  "keywords": [
+    "ai",
+    "ticket-management",
+    "support-system",
+    "inngest",
+    "react",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
+

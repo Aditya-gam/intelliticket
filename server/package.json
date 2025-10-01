@@ -4,15 +4,18 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "inngest-dev": "npx inngest-cli@latest dev"
+    "dev": "NODE_ENV=development nodemon --exec node --watch './' --ext js index.js",
+    "build": "echo 'No build step needed for Node.js'",
+    "start": "NODE_ENV=production node index.js",
+    "inngest:dev": "inngest-cli dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "tsx": "^4.19.2"
   },
   "dependencies": {
     "@inngest/agent-kit": "^0.8.0",
