@@ -4,6 +4,12 @@ const analyzeTicket = async (ticket) => {
   try {
     console.log("🤖 Starting AI ticket analysis...");
     console.log("API Key present:", !!process.env.GEMINI_API_KEY);
+    console.log("Ticket ID:", ticket._id);
+    console.log("Ticket title:", ticket.title);
+
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY environment variable is not set");
+    }
 
     const supportAgent = createAgent({
       model: gemini({
@@ -76,11 +82,31 @@ Ticket information:
       const jsonString = match ? match[1] : raw.trim();
       const parsed = JSON.parse(jsonString);
       console.log("✅ AI response parsed successfully:", parsed);
+      
+      // Validate required fields
+      if (!parsed.summary || !parsed.priority || !parsed.helpfulNotes || !parsed.relatedSkills) {
+        console.warn("⚠️ AI response missing required fields, using defaults");
+        return {
+          summary: parsed.summary || "Issue requires analysis",
+          priority: parsed.priority || "medium",
+          helpfulNotes: parsed.helpfulNotes || "Manual review required",
+          relatedSkills: parsed.relatedSkills || ["General Support"]
+        };
+      }
+      
       return parsed;
     } catch (e) {
       console.error("❌ Failed to parse JSON from AI response:", e.message);
       console.error("Raw AI response:", raw);
-      return null;
+      
+      // Return fallback response
+      console.log("🔄 Using fallback AI response");
+      return {
+        summary: `Support ticket: ${ticket.title}`,
+        priority: "medium",
+        helpfulNotes: "This ticket requires manual review and analysis.",
+        relatedSkills: ["General Support"]
+      };
     }
   } catch (error) {
     console.error("❌ Error making AI request:");

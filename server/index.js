@@ -58,7 +58,13 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     database: dbStatus,
-    mongodb: mongoose.connection.readyState === 1 ? 'healthy' : 'unhealthy'
+    mongodb: mongoose.connection.readyState === 1 ? 'healthy' : 'unhealthy',
+    environment: {
+      gemini_api_key: !!process.env.GEMINI_API_KEY,
+      inngest_event_key: !!process.env.INNGEST_EVENT_KEY,
+      inngest_signing_key: !!process.env.INNGEST_SIGNING_KEY,
+      node_env: process.env.NODE_ENV
+    }
   });
 });
 

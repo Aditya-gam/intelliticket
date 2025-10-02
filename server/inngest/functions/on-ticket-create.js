@@ -28,13 +28,20 @@ export const onTicketCreated = inngest.createFunction(
       // Call analyzeTicket directly - agent-kit creates its own steps internally
       let aiResponse;
       try {
+        console.log("🤖 Starting AI analysis for ticket:", ticket._id);
+        console.log("🔑 GEMINI_API_KEY present:", !!process.env.GEMINI_API_KEY);
+        
         aiResponse = await analyzeTicket(ticket);
+        console.log("✅ AI analysis completed:", aiResponse ? "Success" : "Failed");
       } catch (error) {
         console.error("❌ AI Analysis Error:");
         console.error("Message:", error.message);
         console.error("Stack:", error.stack);
         console.error("Full error:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-        throw error;
+        
+        // Don't throw error - continue with basic ticket processing
+        console.log("⚠️ Continuing without AI analysis due to error");
+        aiResponse = null;
       }
 
       const relatedskills = await step.run("update-ticket-with-ai-analysis", async () => {
