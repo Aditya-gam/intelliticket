@@ -16,7 +16,7 @@ const analyzeTicket = async (ticket) => {
         model: "gemini-2.5-flash-lite",
         apiKey: process.env.GEMINI_API_KEY,
       }),
-      name: "AI Ticket Triage Assistant",
+      name: "IntelliTicket AI Assistant",
       system: `You are an expert AI assistant that processes technical support tickets. 
 
 Your job is to:

@@ -1,5 +1,5 @@
 {
-  "name": "ai-ticket-assistant",
+  "name": "intelliticket-backend",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -17,7 +17,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "IntelliTicket Backend - AI-powered ticket management system",
   "engines": {
     "node": ">=18.0.0"
   },

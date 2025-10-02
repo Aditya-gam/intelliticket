@@ -1,7 +1,7 @@
 {
   "name": "intelliticket",
   "version": "1.0.0",
-  "description": "A smart ticket management system that uses AI to automatically categorize, prioritize, and assign support tickets",
+  "description": "IntelliTicket - A smart ticket management system that uses AI to automatically categorize, prioritize, and assign support tickets",
   "private": true,
   "type": "module",
   "scripts": {
