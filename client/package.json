@@ -7,10 +7,12 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
+    "start": "vite preview --host 0.0.0.0 --port 4173",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.49.1",
     "@tailwindcss/vite": "^4.1.8",
     "daisyui": "^5.0.42",
     "react": "^19.1.0",
