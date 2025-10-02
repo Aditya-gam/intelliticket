@@ -1,12 +1,15 @@
 import { Inngest } from "inngest";
 
-// Configure Inngest for local development
-// In production, you would set INNGEST_EVENT_KEY environment variable
+// Configure Inngest for both development and production
 const inngestConfig = {
   id: "ticketing-system",
-  // For local development, we can use a mock event key or disable cloud features
+  // Use event key for production, fallback to local development
   ...(process.env.INNGEST_EVENT_KEY && { 
     eventKey: process.env.INNGEST_EVENT_KEY 
+  }),
+  // Add signing key for webhook verification in production
+  ...(process.env.INNGEST_SIGNING_KEY && {
+    signingKey: process.env.INNGEST_SIGNING_KEY
   })
 };
 
