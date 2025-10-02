@@ -1,0 +1,14 @@
+{
+  "migration_date": "2025-10-02T02:19:38.946Z",
+  "total_users": 1,
+  "users": [
+    {
+      "old_email": "adi.owner@test.com",
+      "old_role": "user",
+      "old_skills": [],
+      "old_created_at": "2025-10-01T03:41:31.970Z",
+      "clerk_user_id": null,
+      "migration_status": "pending"
+    }
+  ]
+}
