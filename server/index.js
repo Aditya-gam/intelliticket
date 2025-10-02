@@ -19,15 +19,33 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(pinoHttp({ logger }));
-app.use(cors());
+// Configure CORS for Netlify frontend
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000', // Alternative dev port
+    'https://*.netlify.app', // Netlify deployments
+    'https://*.vercel.app', // Vercel deployments (backup)
+    process.env.FRONTEND_URL, // Custom frontend URL if set
+  ].filter(Boolean),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  
   res.json({
-    status: 'ok',
+    status: dbStatus === 'connected' ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    database: dbStatus,
+    mongodb: mongoose.connection.readyState === 1 ? 'healthy' : 'unhealthy'
   });
 });
 
@@ -52,4 +70,12 @@ mongoose
     logger.info("MongoDB connected ✅");
     app.listen(PORT, () => logger.info(`🚀 Server at http://localhost:${PORT}`));
   })
-  .catch((err) => logger.error("❌ MongoDB error: ", err));
+  .catch((err) => {
+    logger.error("❌ MongoDB connection failed:", err.message);
+    logger.error("Make sure MONGO_URI environment variable is set correctly");
+    
+    // Start server anyway for health checks, but log the error
+    app.listen(PORT, () => {
+      logger.warn(`🚀 Server started at http://localhost:${PORT} but MongoDB connection failed`);
+    });
+  });
