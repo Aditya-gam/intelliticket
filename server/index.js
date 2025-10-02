@@ -24,16 +24,29 @@ const corsOptions = {
   origin: [
     'http://localhost:5173', // Vite dev server
     'http://localhost:3000', // Alternative dev port
-    'https://*.netlify.app', // Netlify deployments
+    'https://unrivaled-daifuku-2c910e.netlify.app', // Your specific Netlify URL
+    'https://*.netlify.app', // All Netlify deployments
     'https://*.vercel.app', // Vercel deployments (backup)
     process.env.FRONTEND_URL, // Custom frontend URL if set
   ].filter(Boolean),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200, // For legacy browser support
 };
 
 app.use(cors(corsOptions));
+
+// Add CORS debugging middleware
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    logger.info(`CORS preflight request from: ${req.headers.origin}`);
+    logger.info(`Requested method: ${req.headers['access-control-request-method']}`);
+    logger.info(`Requested headers: ${req.headers['access-control-request-headers']}`);
+  }
+  next();
+});
+
 app.use(express.json());
 
 // Health check endpoint
