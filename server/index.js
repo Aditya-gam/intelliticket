@@ -5,6 +5,7 @@ import { serve } from "inngest/express";
 import pinoHttp from "pino-http";
 import userRoutes from "./routes/user.js";
 import ticketRoutes from "./routes/ticket.js";
+import webhookRoutes from "./routes/webhook.js";
 import { inngest } from "./inngest/client.js";
 import { onUserSignup } from "./inngest/functions/on-signup.js";
 import { onTicketCreated } from "./inngest/functions/on-ticket-create.js";
@@ -32,6 +33,7 @@ app.get('/health', (req, res) => {
 
 app.use("/api/auth", userRoutes);
 app.use("/api/tickets", ticketRoutes);
+app.use("/api/webhooks", webhookRoutes);
 
 app.use(
   "/api/inngest",

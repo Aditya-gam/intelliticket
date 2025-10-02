@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useUsersApi } from "../utils/api.js";
+import Navbar from "../components/navbar.jsx";
 
 export default function AdminPanel() {
   const [users, setUsers] = useState([]);
@@ -6,31 +8,22 @@ export default function AdminPanel() {
   const [editingUser, setEditingUser] = useState(null);
   const [formData, setFormData] = useState({ role: "", skills: "" });
   const [searchQuery, setSearchQuery] = useState("");
+  const { fetchUsers, updateUser } = useUsersApi();
 
-  const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/auth/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsers(data);
-        setFilteredUsers(data);
-      } else {
-        console.error(data.error);
-      }
+      const data = await fetchUsers();
+      setUsers(data);
+      setFilteredUsers(data);
     } catch (err) {
       console.error("Error fetching users", err);
+      alert("Failed to load users: " + err.message);
     }
-  };
+  }, [fetchUsers]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   const handleEditClick = (user) => {
     setEditingUser(user.email);
@@ -42,36 +35,21 @@ export default function AdminPanel() {
 
   const handleUpdate = async () => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SERVER_URL}/auth/update-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            email: editingUser,
-            role: formData.role,
-            skills: formData.skills
-              .split(",")
-              .map((skill) => skill.trim())
-              .filter(Boolean),
-          }),
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.error(data.error || "Failed to update user");
-        return;
-      }
+      await updateUser({
+        email: editingUser,
+        role: formData.role,
+        skills: formData.skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
+      });
 
       setEditingUser(null);
       setFormData({ role: "", skills: "" });
-      fetchUsers();
+      loadUsers();
     } catch (err) {
       console.error("Update failed", err);
+      alert("Failed to update user: " + err.message);
     }
   };
 
@@ -84,8 +62,10 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-6">Admin Panel - Manage Users</h1>
+    <div>
+      <Navbar />
+      <div className="max-w-4xl mx-auto mt-10 p-4">
+        <h1 className="text-2xl font-bold mb-6">Admin Panel - Manage Users</h1>
       <input
         type="text"
         className="input input-bordered w-full mb-6"
@@ -160,6 +140,7 @@ export default function AdminPanel() {
           )}
         </div>
       ))}
+      </div>
     </div>
   );
 }

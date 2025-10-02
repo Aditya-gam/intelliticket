@@ -1,49 +1,51 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { useTicketsApi } from "../utils/api.js";
+import Navbar from "../components/navbar.jsx";
 
 export default function TicketDetailsPage() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const token = localStorage.getItem("token");
+  const { fetchTicket } = useTicketsApi();
 
   useEffect(() => {
-    const fetchTicket = async () => {
+    const loadTicket = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/tickets/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        if (res.ok) {
-          setTicket(data.ticket);
-        } else {
-          alert(data.message || "Failed to fetch ticket");
-        }
+        const data = await fetchTicket(id);
+        setTicket(data.ticket);
       } catch (err) {
         console.error(err);
-        alert("Something went wrong");
+        alert("Failed to load ticket: " + err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTicket();
-  }, [id]);
+    loadTicket();
+  }, [id, fetchTicket]);
 
   if (loading)
-    return <div className="text-center mt-10">Loading ticket details...</div>;
-  if (!ticket) return <div className="text-center mt-10">Ticket not found</div>;
+    return (
+      <div>
+        <Navbar />
+        <div className="text-center mt-10">Loading ticket details...</div>
+      </div>
+    );
+  if (!ticket) 
+    return (
+      <div>
+        <Navbar />
+        <div className="text-center mt-10">Ticket not found</div>
+      </div>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Ticket Details</h2>
+    <div>
+      <Navbar />
+      <div className="max-w-3xl mx-auto p-4">
+        <h2 className="text-2xl font-bold mb-4">Ticket Details</h2>
 
       <div className="card bg-gray-800 shadow p-4 space-y-4">
         <h3 className="text-xl font-semibold">{ticket.title}</h3>
@@ -91,6 +93,7 @@ export default function TicketDetailsPage() {
             )}
           </>
         )}
+      </div>
       </div>
     </div>
   );

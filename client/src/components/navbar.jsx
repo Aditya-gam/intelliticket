@@ -1,18 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
+import { ClerkUserButton } from "./clerk-auth.jsx";
 
 export default function Navbar() {
-  const token = localStorage.getItem("token");
-  let user = localStorage.getItem("user");
-  if (user) {
-    user = JSON.parse(user);
-  }
-  const navigate = useNavigate();
+  const { user, isSignedIn } = useUser();
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
   return (
     <div className="navbar bg-base-200">
       <div className="flex-1">
@@ -20,27 +12,27 @@ export default function Navbar() {
           Ticket AI
         </Link>
       </div>
-      <div className="flex gap-2">
-        {!token ? (
+      <div className="flex gap-2 items-center">
+        {!isSignedIn ? (
           <>
-            <Link to="/signup" className="btn btn-sm">
-              Signup
+            <Link to="/sign-up" className="btn btn-sm">
+              Sign Up
             </Link>
-            <Link to="/login" className="btn btn-sm">
-              Login
+            <Link to="/sign-in" className="btn btn-sm">
+              Sign In
             </Link>
           </>
         ) : (
           <>
-            <p>Hi, {user?.email}</p>
-            {user && user?.role === "admin" ? (
+            <span className="text-sm">
+              Hi, {user?.firstName || user?.emailAddresses?.[0]?.emailAddress}
+            </span>
+            {user?.publicMetadata?.role === "admin" && (
               <Link to="/admin" className="btn btn-sm">
                 Admin
               </Link>
-            ) : null}
-            <button onClick={logout} className="btn btn-sm">
-              Logout
-            </button>
+            )}
+            <ClerkUserButton />
           </>
         )}
       </div>

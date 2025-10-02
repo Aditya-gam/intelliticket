@@ -1,29 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
+import { useTicketsApi } from "../utils/api.js";
+import Navbar from "../components/navbar.jsx";
 
 export default function Tickets() {
   const [form, setForm] = useState({ title: "", description: "" });
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { fetchTickets, createTicket } = useTicketsApi();
 
-  const token = localStorage.getItem("token");
-
-  const fetchTickets = async () => {
+  const loadTickets = useCallback(async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
-        headers: { Authorization: `Bearer ${token}` },
-        method: "GET",
-      });
-      const data = await res.json();
+      const data = await fetchTickets();
       setTickets(data.tickets || []);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
+      alert("Failed to load tickets. Please try again.");
     }
-  };
+  }, [fetchTickets]);
 
   useEffect(() => {
-    fetchTickets();
-  }, []);
+    loadTickets();
+  }, [loadTickets]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,25 +31,11 @@ export default function Tickets() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/tickets`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setForm({ title: "", description: "" });
-        fetchTickets(); // Refresh list
-      } else {
-        alert(data.message || "Ticket creation failed");
-      }
+      await createTicket(form);
+      setForm({ title: "", description: "" });
+      loadTickets(); // Refresh list
     } catch (err) {
-      alert("Error creating ticket");
+      alert("Error creating ticket: " + err.message);
       console.error(err);
     } finally {
       setLoading(false);
@@ -59,8 +43,10 @@ export default function Tickets() {
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Create Ticket</h2>
+    <div>
+      <Navbar />
+      <div className="p-4 max-w-3xl mx-auto">
+        <h2 className="text-2xl font-bold mb-4">Create Ticket</h2>
 
       <form onSubmit={handleSubmit} className="space-y-3 mb-8">
         <input
@@ -100,6 +86,7 @@ export default function Tickets() {
           </Link>
         ))}
         {tickets.length === 0 && <p>No tickets submitted yet.</p>}
+      </div>
       </div>
     </div>
   );
